@@ -1,0 +1,61 @@
+GitLab Omnibus 9.0
+
+1. make PostgreSql listen tcp/ip
+	modify /etc/gitlab/gitlab.rb
+	########
+		postgresql['enable'] = true
+		postgresql['listen_address'] = "0.0.0.0"
+		postgresql['port'] = 5432
+		postgresql['data_dir'] = "/var/opt/gitlab/postgresql/data"
+		postgresql['md5_auth_cidr_addresses'] = ["0.0.0.0/0"]
+		postgresql['trust_auth_cidr_addresses'] = ["0.0.0.0/0"]
+	########
+	apply gitlab-ctl reconfigure
+	create new user
+	    CREATE USER yshen WITH PASSWORD 'password' SUPERUSER;
+
+2. use external SMTP Server settings
+	modify /etc/gitlab/gitlab.rb
+	########
+		gitlab_rails['smtp_enable'] = true
+		gitlab_rails['smtp_address'] = "smtp.exmail.qq.com"
+		gitlab_rails['smtp_port'] = 465
+		gitlab_rails['smtp_user_name'] = "xxxx@xx.com"
+		gitlab_rails['smtp_password'] = "password"
+		gitlab_rails['smtp_authentication'] = "login"
+		gitlab_rails['smtp_enable_starttls_auto'] = true
+		gitlab_rails['smtp_tls'] = true
+		gitlab_rails['gitlab_email_from'] = 'xxxx@xx.com'
+		gitlab_rails['gitlab_email_from'] = 'gitlab@example.com'
+	########
+
+3. enable HTTPS
+	mkdir -p /etc/gitlab/ssl
+	chmod 700 /etc/gitlab/ssl
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/gitlab/ssl/gitlab.starmoon.sh.key -out /etc/gitlab/ssl/gitlab.starmoon.sh.crt
+	modify /etc/gitlab/gitlab.rb
+	#########
+		external_url 'https://gitlab.starmoon.sh'
+		nginx['redirect_http_to_https'] = true
+		nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.starmoon.sh.crt"
+		nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.starmoon.sh.key"
+	#########
+
+4. enable Gitlab internal Container Registry
+	modify /etc/gitlab/gitlab.rb
+	#########
+		registry_external_url 'https://gitlab.starmoon.sh:4567'
+		registry_nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.starmoon.sh.crt"
+		registry_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.starmoon.sh.key"
+	#########
+
+5. Gitlab Runner on docker host visit self signed registry
+    copy cert file from self signed registry host to gitlab runner host
+        put /etc/gitlab/ssl/gitlab.starmoon.sh.crt from gitlab server to /etc/docker/certs.d/gitlab.starmoon.sh:4567/ca.crt on running gitlab runner host
+        put /etc/gitlab/ssl/gitlab.starmoon.sh.crt from gitlab server to /etc/gitlab-runner/certs/gitlab.starmoon.sh.crt on running gitlab runner host
+
+6. CI build image from Gitlab integrated registry
+    one way:
+      add secret variable "DOCKER_AUTH_CONFIG" at project pipeline settings
+    another way:
+      add trigger pipeline user to developer role for project which has source image 

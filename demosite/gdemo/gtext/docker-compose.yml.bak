@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+
+  render:
+    image: gitlab.starmoon.sh:4567/gdemo/gitlab-image-render:gdev.e6c3fb95934d34983366b881fa82d88eeb41b5b5
+    ports:
+      - "22"
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "50M"
+    environment:
+      - OSS_URL=gitlab.sh
+      - PRIVATE_BUCKET=gitlab-private
+      - PUBLIC_BUCKET=gitlab-public
+
+  analyzer:
+    image: gitlab.starmoon.sh:4567/gdemo/gitlab-image-analyzer:gdev.46c3621972d8f3b5b1a7aa7be5ad9b340ed487e1
+    ports:
+      - "3003"
+      - "22"
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "50M"

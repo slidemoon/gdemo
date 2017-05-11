@@ -1,0 +1,75 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Gdemo</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+
+    <link href="{% static 'gdemo/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'gdemo/css/style.css' %}" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-11">
+			<h3 class="text-center text-primary">
+				{% block page %} Gdemo Main Page {% endblock %}
+			</h3>
+		</div>
+		<div class="col-md-1">
+			<form role="form" action="{% url 'gdemo:logout' %}" method="post">
+			{% csrf_token %}
+				<button type="submit" class="btn btn-primary btn-sm">
+					Logout
+				</button>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			{% block active %}
+			<ul class="nav nav-pills">
+				<li class="active">
+					<a href="{% url 'gdemo:main' %}">Home</a>
+				</li>
+				<li>
+					<a href="{% url 'gdemo:gproject' %}">Project</a>
+				</li>
+				<li>
+					<a href="{% url 'gdemo:ddeploy' %}">Deploy</a>
+				</li>
+			</ul>
+			{% endblock %}
+			{% block content %}
+			<h2>
+				Personal Info
+			</h2>
+			<p>
+				You have <a class="btn" href="#">{{ account_project_num }}</a> Projects
+			</p>  
+			<ul>
+				{% for project in account_project_list %}
+				<li>
+					{{ project }}
+				</li>
+				{% endfor %}
+			</ul>
+			{% endblock %}
+		</div>
+	</div>
+</div>
+
+    <script src="{% static 'gdemo/js/jquery.min.js' %}"></script>
+    <script src="{% static 'gdemo/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'gdemo/js/scripts.js' %}"></script>
+  </body>
+</html>

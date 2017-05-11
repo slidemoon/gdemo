@@ -1,0 +1,97 @@
+{% extends "gdemo/main.html" %}
+
+{% block page %} Gdemo Project Page {% endblock %}
+
+
+{% block active %}
+<ul class="nav nav-pills">
+	<li>
+		<a href="{% url 'gdemo:main' %}">Home</a>
+	</li>
+	<li class="active">
+		<a href="{% url 'gdemo:gproject' %}">Project</a>
+	</li>
+	<li>
+		<a href="{% url 'gdemo:ddeploy' %}">Deploy</a>
+	</li>
+</ul>
+{% endblock %}
+
+
+{% block content %}
+<h2>
+	Project Info
+</h2>
+<div class="row">
+	<div class="col-md-12">
+		<div class="dropdown">
+  			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">See commit info for Project 
+  		<span class="caret"></span></button>
+  		<ul class="dropdown-menu">
+  			{% for i in account_project_list %}
+    		<li><a href="?project_path_with_namespace={{ i }}">{{ i }}</a></li>
+    		{% endfor %}
+  		</ul>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-striped table-condensed">
+			<thead>
+				<tr>
+					<th>
+						#
+					</th>
+					<th>
+						Branch
+					</th>
+					<th>
+						Commit_ID
+					</th>
+					<th>
+						Message
+					</th>
+					<th>
+						Job_Status
+					</th>
+					<th>
+						Job_Time
+					</th>
+					<th>
+						Docker_Image
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for commit in account_commit_list %}
+				<tr {% if commit.job_status == 'failed' %} class="danger" {% elif commit.job_status == 'success' %} class="success" {% elif commit.job_status == 'canceled' %} class="warning" {% else %} class="active" {% endif %}>
+					<td>
+						{{ forloop.counter }}
+					</td>
+					<td>
+						{{ commit.branch_name }}
+					</td>
+					<td>
+						{{ commit.commit_id }}
+					</td>
+					<td>
+						{{ commit.message }}
+					</td>
+					<td>
+						{{ commit.job_status }}
+					</td>
+					<td>
+						{{ commit.job_time }}
+					</td>
+					<td>
+						{{ commit.docker_image}}
+					</td>	
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
+
