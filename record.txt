@@ -1,4 +1,4 @@
-GitLab Omnibus 9.0
+GitLab Omnibus 9.0  &&  Docker 1.13
 
 1. make PostgreSql listen tcp/ip
 	modify /etc/gitlab/gitlab.rb
