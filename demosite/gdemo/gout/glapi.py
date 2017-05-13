@@ -110,7 +110,7 @@ def list_docker_image_for_project(username, password, project_path_with_namespac
     return image_list
 
 
-#login_result = login_account('gdev', 'Wq22Wq22')
+#login_result = login_account('gdev', 'FdrrFdrr')
 #print login_result
 #print list_account_projects(login_result['gitlab_username_private_token'])
 #print list_account_commits_for_project(login_result['gitlab_username_private_token'], 'gdev', 'gdemo/gitlab-image-analyzer')
