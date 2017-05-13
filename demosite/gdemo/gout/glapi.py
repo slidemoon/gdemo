@@ -115,7 +115,7 @@ def list_docker_image_for_project(username, password, project_path_with_namespac
 #print list_account_projects(login_result['gitlab_username_private_token'])
 #print list_account_commits_for_project(login_result['gitlab_username_private_token'], 'gdev', 'gdemo/gitlab-image-analyzer')
 #print list_job_for_project(login_result['gitlab_username_private_token'], 'gdemo/gitlab-image-analyzer')
-#print list_docker_image_for_project('gdev', 'Wq22Wq22', 'gdemo/gitlab-text-metric')
+#print list_docker_image_for_project('gdev', 'FdrrFdrr', 'gdemo/gitlab-text-metric')
 #print list_merge_request_for_project(login_result['gitlab_username_private_token'], 'gdemo/gitlab-image-analyzer')
 
 
