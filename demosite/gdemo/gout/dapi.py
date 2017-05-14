@@ -80,7 +80,7 @@ def service_map_port(username_service_list, user_docker_file, username_number):
     with open(user_docker_file, 'r') as f:
         output = f.read()
         if output == '':
-            pass
+            available_username_port_set = int_username_all_port_set
         else:
             pre_username_service_list = json.loads(output)
             int_username_used_port_set = set()
@@ -91,7 +91,7 @@ def service_map_port(username_service_list, user_docker_file, username_number):
                             for z in y['publish']:
                                 int_username_used_port_set.add(int(z.split(':')[0]))
 
-    available_username_port_set = int_username_all_port_set - int_username_used_port_set
+            available_username_port_set = int_username_all_port_set - int_username_used_port_set
 
     cur_username_service_list = username_service_list
     for i in cur_username_service_list:

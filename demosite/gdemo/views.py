@@ -114,7 +114,6 @@ def ddeploy(request):
             x, y = dapi.docker_network_create(username_network_name, 'overlay')
             username_number = y['IPAM']['Config'][0]['Gateway'].split('.')[2]
 
-        print default_service_list
         username_docker_file_name = 'gtext/' + gitlab_username + '_docker_info'
         username_docker_file = os.path.join(os.path.dirname(__file__), username_docker_file_name)
         if os.path.isfile(username_docker_file):
@@ -122,11 +121,7 @@ def ddeploy(request):
         else:
             create_file = open(username_docker_file, 'w')
             create_file.close()
-        print '------------------'
-        print username_number
-        print docker_service_list
-        print '------------------'
-        print gitlab_service_status_list_2 
+
         username_service_list = []
         for i in default_service_list:
             for x, y in i.items():
@@ -134,8 +129,8 @@ def ddeploy(request):
                     for m, n in z.items():
                         if x == m:
                             username_service_list.append({x: {'status': n['status'], 'publish': y['publish'], 'image': y['image'], 'hostname': y['hostname'], 'name': y['name'], 'env': y['env']}})
-        print '##############'
-        print username_service_list
+        cur_username_service_list = dapi.service_map_port(username_service_list, username_docker_file, username_number)
+        print cur_username_service_list
 
         return HttpResponse('post result')
 
