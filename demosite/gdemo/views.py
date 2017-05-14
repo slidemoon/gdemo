@@ -115,14 +115,27 @@ def ddeploy(request):
             username_number = y['IPAM']['Config'][0]['Gateway'].split('.')[2]
 
         print default_service_list
-        username_port_file_name = 'gtext/' + gitlab_username + '_docker_port'
-        username_port_file = os.path.join(os.path.dirname(__file__), username_port_file_name)
-        if os.path.isfile(username_port_file):
+        username_docker_file_name = 'gtext/' + gitlab_username + '_docker_info'
+        username_docker_file = os.path.join(os.path.dirname(__file__), username_docker_file_name)
+        if os.path.isfile(username_docker_file):
             pass
         else:
-            create_file = open(username_port_file, 'w')
+            create_file = open(username_docker_file, 'w')
             create_file.close()
+        print '------------------'
         print username_number
+        print docker_service_list
+        print '------------------'
+        print gitlab_service_status_list_2 
+        username_service_list = []
+        for i in default_service_list:
+            for x, y in i.items():
+                for z in gitlab_service_status_list_2:
+                    for m, n in z.items():
+                        if x == m:
+                            username_service_list.append({x: {'status': n['status'], 'publish': y['publish'], 'image': y['image'], 'hostname': y['hostname'], 'name': y['name'], 'env': y['env']}})
+        print '##############'
+        print username_service_list
 
         return HttpResponse('post result')
 
