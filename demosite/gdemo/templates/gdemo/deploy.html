@@ -68,23 +68,22 @@
 								<select class="form-control" name='{{ x }}_image'>
 								  {% if y.image == '-' %}
 								  <option selected>-</option>
-								  {% for z in y.available_image %}
-								  {% if y.stable_image == z %}
+								  	{% for z in y.available_image %}
+								  		{% if y.stable_image == z %}
   								  <option>{{ z }}(stable)</option>
-  								  {% else %}
+  								  		{% else %}
   								  <option>{{ z }}</option>
-  								  {% endif %}
-								  {% endfor %}
+  								  		{% endif %}
+								  	{% endfor %}
 								  {% else %}
 								  <option selected>{{ y.image }}(current)</option>
-								  <option>-</option>
-  								  {% for z in y.available_image %}
-  								  {% if y.stable_image == z %}
+  								  	{% for z in y.available_image %}
+  								  		{% if y.stable_image == z %}
   								  <option>{{ z }}(stable)</option>
-  								  {% else %}
+  								  		{% else %}
   								  <option>{{ z }}</option>
-  								  {% endif %}
-								  {% endfor %}
+  								  		{% endif %}
+								  	{% endfor %}
 								  {% endif %}
 								</select>
 							</div>

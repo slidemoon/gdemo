@@ -129,9 +129,17 @@ def ddeploy(request):
                     for m, n in z.items():
                         if x == m:
                             username_service_list.append({x: {'status': n['status'], 'publish': y['publish'], 'image': y['image'], 'hostname': y['hostname'], 'name': y['name'], 'env': y['env']}})
-        cur_username_service_list = dapi.service_map_port(username_service_list, username_docker_file, username_number)
-        print cur_username_service_list
 
+        for i in username_service_list:
+            for x, y in i.items():
+                for m, n in request.POST.items():
+                    if x in m and str(m).endswith('_switch'):
+                        y['status'] = str(n)
+                    if x in m and str(m).endswith('_image') and n != u'-':
+                        y['image'] = str(n)
+
+        cur_username_service_list = dapi.service_map_port(username_service_list, username_docker_file, username_number, gitlab_username)
+        print cur_username_service_list
         return HttpResponse('post result')
 
 

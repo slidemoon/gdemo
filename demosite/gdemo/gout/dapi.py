@@ -69,7 +69,7 @@ def docker_service_list():
         service_list.append({ i.name: i.attrs['Spec']['TaskTemplate']['ContainerSpec']['Image'].split('@sha256')[0]})
     return service_list
 
-def service_map_port(username_service_list, user_docker_file, username_number):
+def service_map_port(username_service_list, user_docker_file, username_number, gitlab_username):
     int_username_docker_min_number = int(username_number) * 100 + 30000
     int_username_docker_max_number = int_username_docker_min_number + 99
 
@@ -96,6 +96,8 @@ def service_map_port(username_service_list, user_docker_file, username_number):
     cur_username_service_list = username_service_list
     for i in cur_username_service_list:
         for x, y in i.items():
+            y['name'] = gitlab_username + '_' + y['name']
+            y['hostname'] = gitlab_username + '_' + y['hostname']
             if y['status'] == 'enable':
                 if len(y['publish']) != 0:
                     for index, z in enumerate(y['publish']):
@@ -105,7 +107,9 @@ def service_map_port(username_service_list, user_docker_file, username_number):
                         map_port_set.add(map_port)
                         available_username_port_set = available_username_port_set - map_port_set
                         y['publish'][index] = str_map_port + ':' + z
-                        print str_map_port
+            new_key = gitlab_username + '_' + x
+            i[new_key] = i[x]
+            del i[x]
 
     input_list = cur_username_service_list
 
@@ -115,11 +119,10 @@ def service_map_port(username_service_list, user_docker_file, username_number):
     return cur_username_service_list
 
 
-
-test_list = [{'gitlab-text-metric': {'status': 'enable', 'name': 'gitlab-text-metric', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-text-metric:master.1234567890', 'hostname': 'gitlab-text-metric', 'publish': ['8080', '22', '80'], 'env': []}}, {'gitlab-image-analyzer': {'status': 'enable', 'name': 'gitlab-image-analyzer', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-image-analyzer:master.7da13c3d35a6c5831aacf549b0c9c5c0688aa05a', 'hostname': 'gitlab-image-analyzer', 'publish': ['3003', '22', '9090'], 'env': []}}, {'gitlab-image-render': {'status': 'enable', 'name': 'gitlab-image-render', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-image-render:master.52e259387886c577bcf102952c448c3f90dd602b', 'hostname': 'gitlab-image-render', 'publish': [], 'env': ['OSS_URL=gitlab.sh', 'PRIVATE_BUCKET=gitlab-private', 'PUBLIC_BUCKET=gitlab-public']}}]
-service_map_port(test_list, '/Users/yshen/Personal/gdemo/demosite/gdemo/gtext/gdev_docker_info', 156)
-
 '''
+test_list = [{'gitlab-text-metric': {'status': 'enable', 'name': 'gitlab-text-metric', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-text-metric:master.1234567890', 'hostname': 'gitlab-text-metric', 'publish': ['8080', '22', '80'], 'env': []}}, {'gitlab-image-analyzer': {'status': 'enable', 'name': 'gitlab-image-analyzer', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-image-analyzer:master.7da13c3d35a6c5831aacf549b0c9c5c0688aa05a', 'hostname': 'gitlab-image-analyzer', 'publish': ['3003', '22', '9090'], 'env': []}}, {'gitlab-image-render': {'status': 'enable', 'name': 'gitlab-image-render', 'image': 'gitlab.starmoon.sh:4567/gdemo/gitlab-image-render:master.52e259387886c577bcf102952c448c3f90dd602b', 'hostname': 'gitlab-image-render', 'publish': [], 'env': ['OSS_URL=gitlab.sh', 'PRIVATE_BUCKET=gitlab-private', 'PUBLIC_BUCKET=gitlab-public']}}]
+service_map_port(test_list, '/Users/yshen/Personal/gdemo/demosite/gdemo/gtext/gdev_docker_info', 156, 'gdev')
+
 print str(random.sample(get_available_subnet_set(), 1)[0])
 
 s_num, s_list = yaml_to_service_args()
