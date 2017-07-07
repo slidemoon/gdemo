@@ -7,6 +7,7 @@ services:
     ports:
       - "3003"
       - "22"
+      - "8080"
     deploy:
       mode: replicated
       replicas: 1
@@ -14,6 +15,8 @@ services:
         limits:
           cpus: "0.1"
           memory: "50M"
+    environment:
+      - VAR_1=shanghai
 
   gitlab-image-render:
     image: gitlab.starmoon.sh:4567/gdemo/gitlab-image-render:master.52e259387886c577bcf102952c448c3f90dd602b

@@ -3,6 +3,7 @@ import ipaddress
 import random
 import yaml
 import json
+from copy import deepcopy
 
 
 def docker_network_list():
@@ -83,8 +84,7 @@ def service_map_port(username_service_list, user_docker_file, username_number, g
             available_username_port_set = int_username_all_port_set
         else:
             pre_username_service_list = json.loads(output)
-            print pre_username_service_list
-            print ''
+            print '@@@@@@@@ pre_username_service_list %s' % pre_username_service_list
             int_username_used_port_set = set()
             for i in pre_username_service_list:
                 for x, y in i.items():
@@ -96,15 +96,30 @@ def service_map_port(username_service_list, user_docker_file, username_number, g
             available_username_port_set = int_username_all_port_set - int_username_used_port_set
 
     cur_username_service_list = username_service_list
-    deploy_list = []
     for i in cur_username_service_list:
         for x, y in i.items():
-            y['name'] = gitlab_username + '_' + y['name']
-            y['hostname'] = gitlab_username + '_' + y['hostname']
-            if y['status'] == 'enable' and not pre_username_service_list in locals() :
-            #if y['status'] == 'enable' and y['image'] != [ n['image'] for j in pre_username_service_list for m, n in j.items() if m == y['name'] ][0]:
-                #deploy_list.append(y['name'])
-                #print deploy_list
+            if y['action'] == 'start':
+                y['status'] = 'enable'
+            elif y['action'] == 'stop':
+                y['status'] = 'disable'
+            elif y['action'] == 'update':
+                y['status'] = 'enable'
+            elif y['action'] == 'nothing':
+                if not 'pre_username_service_list' in locals():
+                    y['status'] = 'disable'
+                else:
+                    for j in pre_username_service_list:
+                        for m, n in j.items():
+                            if x == m:
+                                if n['status'] == 'enable':
+                                    y['status'] = 'enable'
+                                elif n['status'] == 'disable':
+                                    y['status'] = 'disable'
+    print '@@@@@@@@ cur_username_service_list %s' % cur_username_service_list
+
+    for i in cur_username_service_list:
+        for x, y in i.items():
+            if y['action'] == 'start' or y['action'] == 'update':
                 if len(y['publish']) != 0:
                     for index, z in enumerate(y['publish']):
                         map_port_set = set()
@@ -113,16 +128,16 @@ def service_map_port(username_service_list, user_docker_file, username_number, g
                         map_port_set.add(map_port)
                         available_username_port_set = available_username_port_set - map_port_set
                         y['publish'][index] = str_map_port + ':' + z
-            new_key = gitlab_username + '_' + x
-            i[new_key] = i[x]
-            del i[x]
+    print '@@@@@@@@ new_cur_username_service_list %s' % cur_username_service_list
 
-    input_list = cur_username_service_list
-
+    input_list = deepcopy(cur_username_service_list)
+    for i in input_list:
+        for x, y in i.items():
+            del y['action']
+    print '@@@@@@@@ input_list %s' % input_list
     with open(user_docker_file, 'w') as f:
         f.write(json.dumps(input_list))
-    print cur_username_service_list
-
+   
     return cur_username_service_list
 
 def docker_service_create(image, name, network, env, publish):
@@ -130,23 +145,33 @@ def docker_service_create(image, name, network, env, publish):
     publish_dict = {}
     if publish:
         for i in publish:
-            print i
             i_list = i.split(':')
-            print i_list
             target_port = i_list[0]
             published_port = i_list[1]
             publish_dict[target_port] = published_port
     print publish_dict
 
-
     docker.types.EndpointSpec(ports=publish_dict)
     client.services.create(image, name = name, networks = [network], env = env)
+
+def docker_service_remove(name):
+    client = docker.DockerClient(base_url='tcp://192.168.56.101:32775')
+    for i in client.services.list():
+        if i.name == name:
+            i.remove()
+
 
 def deploy_docker(cur_username_service_list, username_network_name):
     for i in cur_username_service_list:
         for x, y in i.items():
-            if y['status'] == 'enable':
+            if y['action'] == 'start':
                 docker_service_create(y['image'], y['name'], username_network_name, y['env'], y['publish'])
+            elif y['action'] == 'stop':
+                docker_service_remove(y['name'])
+            elif y['action'] == 'update':
+                docker_service_remove(y['name'])
+                docker_service_create(y['image'], y['name'], username_network_name, y['env'], y['publish'])
+
 
 
 '''
